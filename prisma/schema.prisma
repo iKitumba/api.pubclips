@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String      @id @default(uuid())
+  username        String   @unique
+  email           String   @unique
+  password        String
+  name            String
+  bio             String?
+  profilepicture  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  musics          Music[]
+  videos          Video[]
+  comments        Comment[]
+  likes           Like[]
+  
+  @@map("users")
+}
+
+model Music {
+  id            String      @id @default(uuid())
+  title         String
+  description   String?
+  genre         String
+  fileUrl       String
+  coverImageUrl String?
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  comments      Comment[]
+  likes         Like[]
+  
+  @@map("musics")
+}
+
+model Video {
+  id            String      @id @default(uuid())
+  title         String
+  description   String?
+  genre         String
+  videoUrl      String
+  thumbnailUrl  String?
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  comments      Comment[]
+  likes         Like[]
+  
+  @@map("videos")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  userId    String
+  musicId   String?
+  videoId   String?
+  user      User     @relation(fields: [userId], references: [id])
+  music     Music?   @relation(fields: [musicId], references: [id])
+  video     Video?   @relation(fields: [videoId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("comments")
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  musicId   String?
+  videoId   String?
+  user      User     @relation(fields: [userId], references: [id])
+  music     Music?   @relation(fields: [musicId], references: [id])
+  video     Video?   @relation(fields: [videoId], references: [id])
+  createdAt DateTime @default(now())
+  
+  @@map("likes")
+}
